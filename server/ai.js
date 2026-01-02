@@ -15,28 +15,7 @@ export async function analyzeQuery(query, databaseType = 'postgresql') {
     }
   });
 
-  const prompt = `
-    Analyze the following SQL query for ${databaseType}:
-    "${query}"
-
-    Provide a detailed performance analysis and optimization suggestions.
-    Response must be a JSON object matching this schema:
-    {
-      "workload_category": "string (FAST, MODERATE, or HEAVY)",
-      "estimated_execution_time": "string (e.g., <10ms, ~50ms)",
-      "estimated_rows_scanned": "number",
-      "detected_issues": ["string"],
-      "optimization_suggestions": ["string"],
-      "index_suggestions": ["string"],
-      "optimized_query": "string",
-      "explanation": "string",
-      "performance_comparison": {
-        "original_cost": "number",
-        "optimized_cost": "number",
-        "improvement_percent": "number"
-      }
-    }
-    `;
+  const prompt = `SQL: ${query} (${databaseType}). Return JSON ONLY: { "workload_category": "FAST|MODERATE|HEAVY", "estimated_execution_time": "time str", "estimated_rows_scanned": number, "detected_issues": ["str"], "optimization_suggestions": ["str"], "index_suggestions": ["str"], "optimized_query": "better sql", "explanation": "explain", "performance_comparison": {"original_cost": 100, "optimized_cost": 50, "improvement_percent": 50} }`;
 
   try {
     console.log(`[${new Date().toLocaleTimeString()}] Calling Gemini API...`);

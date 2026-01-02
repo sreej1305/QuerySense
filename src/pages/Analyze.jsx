@@ -50,90 +50,62 @@ WHERE o.created_at > '2024-01-01'`
         }
     ];
 
+    const [status, setStatus] = useState('');
+
     const analyzeQuery = async () => {
         if (!query.trim()) return;
 
         setIsAnalyzing(true);
         setResult(null);
+        setStatus('Connecting to AI...');
 
-        const analysisPrompt = `Analyze this SQL query and provide optimization recommendations:
-
-SQL Query:
-${query}
-
-Database Type: ${dbType}
-
-Provide a JSON response with the following structure:
-{
-  "workload_category": "FAST" | "MODERATE" | "HEAVY",
-  "estimated_execution_time": "string (e.g., '<10ms', '100-500ms', '>1s')",
-  "estimated_rows_scanned": number,
-  "detected_issues": [
-    {
-      "type": "string (e.g., 'SELECT_ALL', 'MISSING_WHERE', 'FULL_TABLE_SCAN', 'N_PLUS_ONE', 'MISSING_INDEX')",
-      "description": "string describing the issue",
-      "severity": "low" | "medium" | "high"
-    }
-  ],
-  "optimization_suggestions": [
-    {
-      "suggestion": "string describing the optimization",
-      "impact": "string describing expected improvement",
-      "priority": "low" | "medium" | "high"
-    }
-  ],
-  "index_suggestions": [
-    {
-      "table": "string",
-      "columns": ["column1", "column2"],
-      "type": "BTREE" | "HASH" | "GIN" | "GIST"
-    }
-  ],
-  "optimized_query": "string with the optimized SQL query",
-  "explanation": "string with plain-English explanation of all optimizations made"
-}
-
-Be thorough in analyzing:
-- SELECT * usage (suggest specific columns)
-- Missing WHERE clauses
-- JOIN efficiency and types
-- Potential missing indexes
-- ORDER BY without indexes
-- Subquery optimization opportunities
-- N+1 query patterns`;
-
-        const response = await base44.integrations.Core.InvokeLLM({
-            query: query,
-            database_type: dbType
-        });
-
-        // Show result immediately to the user
-        setResult(response);
-        setIsAnalyzing(false);
-
-        // Save to database in the background (asynchronous)
-        base44.entities.QueryAnalysis.create({
-            query_text: query,
-            database_type: dbType,
-            workload_category: response.workload_category,
-            estimated_execution_time: response.estimated_execution_time,
-            estimated_rows_scanned: response.estimated_rows_scanned,
-            detected_issues: response.detected_issues,
-            optimization_suggestions: response.optimization_suggestions,
-            index_suggestions: response.index_suggestions,
-            optimized_query: response.optimized_query,
-            explanation: response.explanation,
-            performance_comparison: {
-                original_cost: 100,
-                optimized_cost: response.workload_category === 'FAST' ? 20 : response.workload_category === 'MODERATE' ? 50 : 80,
-                improvement_percent: response.workload_category === 'FAST' ? 80 : response.workload_category === 'MODERATE' ? 50 : 20
+        // Emergency timeout: 30 seconds
+        const timeout = setTimeout(() => {
+            if (isAnalyzing) {
+                setIsAnalyzing(false);
+                setStatus('Service busy. Please try again.');
             }
-        }).then((savedAnalysis) => {
-            // Update the result with the actual ID once saved, so "View Details" works
-            setResult(prev => ({ ...prev, id: savedAnalysis.id }));
-        }).catch((err) => {
-            console.error("Background save failed:", err);
-        });
+        }, 30000);
+
+        try {
+            setStatus('Analyzing patterns...');
+            const response = await base44.integrations.Core.InvokeLLM({
+                query: query,
+                database_type: dbType
+            });
+
+            setStatus('Finalizing results...');
+            setResult(response);
+            setIsAnalyzing(false);
+            clearTimeout(timeout);
+
+            // Save to database in the background
+            base44.entities.QueryAnalysis.create({
+                query_text: query,
+                database_type: dbType,
+                workload_category: response.workload_category,
+                estimated_execution_time: response.estimated_execution_time,
+                estimated_rows_scanned: response.estimated_rows_scanned,
+                detected_issues: response.detected_issues,
+                optimization_suggestions: response.optimization_suggestions,
+                index_suggestions: response.index_suggestions,
+                optimized_query: response.optimized_query,
+                explanation: response.explanation,
+                performance_comparison: {
+                    original_cost: 100,
+                    optimized_cost: response.workload_category === 'FAST' ? 20 : response.workload_category === 'MODERATE' ? 50 : 80,
+                    improvement_percent: response.workload_category === 'FAST' ? 80 : response.workload_category === 'MODERATE' ? 50 : 20
+                }
+            }).then((savedAnalysis) => {
+                setResult(prev => ({ ...prev, id: savedAnalysis.id }));
+            }).catch(err => console.error("Save error:", err));
+
+        } catch (error) {
+            console.error("Analysis failed:", error);
+            setIsAnalyzing(false);
+            setStatus('Analysis failed. Check your API key or connection.');
+            clearTimeout(timeout);
+        }
     };
 
     const copyToClipboard = (text) => {
@@ -225,7 +197,7 @@ Be thorough in analyzing:
                                     {isAnalyzing ? (
                                         <>
                                             <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                                            Analyzing...
+                                            {status || 'Analyzing...'}
                                         </>
                                     ) : (
                                         <>
@@ -271,7 +243,7 @@ Be thorough in analyzing:
                                         <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center mx-auto mb-4 animate-pulse">
                                             <Sparkles className="w-8 h-8 text-white" />
                                         </div>
-                                        <p className="text-slate-400">Analyzing your query...</p>
+                                        <p className="text-slate-400">{status || 'Analyzing your query...'}</p>
                                     </div>
                                 </motion.div>
                             ) : result ? (
