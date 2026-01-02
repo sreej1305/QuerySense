@@ -107,8 +107,12 @@ Be thorough in analyzing:
             database_type: dbType
         });
 
-        // Save to database
-        const savedAnalysis = await base44.entities.QueryAnalysis.create({
+        // Show result immediately to the user
+        setResult(response);
+        setIsAnalyzing(false);
+
+        // Save to database in the background (asynchronous)
+        base44.entities.QueryAnalysis.create({
             query_text: query,
             database_type: dbType,
             workload_category: response.workload_category,
@@ -124,10 +128,12 @@ Be thorough in analyzing:
                 optimized_cost: response.workload_category === 'FAST' ? 20 : response.workload_category === 'MODERATE' ? 50 : 80,
                 improvement_percent: response.workload_category === 'FAST' ? 80 : response.workload_category === 'MODERATE' ? 50 : 20
             }
+        }).then((savedAnalysis) => {
+            // Update the result with the actual ID once saved, so "View Details" works
+            setResult(prev => ({ ...prev, id: savedAnalysis.id }));
+        }).catch((err) => {
+            console.error("Background save failed:", err);
         });
-
-        setResult({ ...response, id: savedAnalysis.id });
-        setIsAnalyzing(false);
     };
 
     const copyToClipboard = (text) => {

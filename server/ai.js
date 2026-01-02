@@ -8,7 +8,11 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 export async function analyzeQuery(query, databaseType = 'postgresql') {
   const model = genAI.getGenerativeModel({
     model: 'gemini-1.5-flash',
-    generationConfig: { responseMimeType: 'application/json' }
+    generationConfig: {
+      responseMimeType: 'application/json',
+      temperature: 0.2, // Lower temperature for more focused, faster responses
+      topP: 0.8,
+    }
   });
 
   const prompt = `
