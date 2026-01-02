@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import Chatbot from './components/Chatbot';
 
 export default function Layout({ children, currentPageName }) {
     const [mobileOpen, setMobileOpen] = React.useState(false);
@@ -23,6 +24,7 @@ export default function Layout({ children, currentPageName }) {
         { name: 'History', page: 'History', icon: History },
         { name: 'Insights', page: 'Insights', icon: BarChart3 },
         { name: 'Pricing', page: 'Pricing', icon: CreditCard },
+        { name: 'Contact', page: 'Contact', icon: Menu },
     ];
 
     const isLanding = currentPageName === 'Home';
@@ -60,24 +62,24 @@ export default function Layout({ children, currentPageName }) {
             {/* Navigation */}
             <nav className="fixed top-0 left-0 right-0 z-50 border-b border-slate-800/50 bg-slate-950/80 backdrop-blur-xl">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="flex items-center justify-between h-16">
+                    <div className="flex items-center justify-between h-24">
                         {/* Logo */}
-                        <Link to={createPageUrl('Home')} className="flex items-center gap-2">
-                            <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center">
-                                <Sparkles className="w-5 h-5 text-white" />
+                        <Link to={createPageUrl('Home')} className="flex items-center gap-3">
+                            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center">
+                                <Sparkles className="w-7 h-7 text-white" />
                             </div>
-                            <span className="text-lg font-semibold text-white">QuerySense AI</span>
+                            <span className="text-3xl font-bold text-white tracking-tight">QuerySense AI</span>
                         </Link>
 
                         {/* Desktop Nav */}
-                        <div className="hidden md:flex items-center gap-1">
+                        <div className="hidden md:flex items-center gap-2">
                             {navItems.map((item) => (
                                 <Link
                                     key={item.page}
                                     to={createPageUrl(item.page)}
-                                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${currentPageName === item.page
-                                            ? 'bg-slate-800 text-cyan-400'
-                                            : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
+                                    className={`px-4 py-2 rounded-lg text-xl font-medium transition-all ${currentPageName === item.page
+                                        ? 'bg-slate-800 text-cyan-400'
+                                        : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
                                         }`}
                                 >
                                     {item.name}
@@ -109,8 +111,8 @@ export default function Layout({ children, currentPageName }) {
                                             to={createPageUrl(item.page)}
                                             onClick={() => setMobileOpen(false)}
                                             className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all ${currentPageName === item.page
-                                                    ? 'bg-slate-800 text-cyan-400'
-                                                    : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
+                                                ? 'bg-slate-800 text-cyan-400'
+                                                : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
                                                 }`}
                                         >
                                             <item.icon className="w-4 h-4" />
@@ -132,7 +134,7 @@ export default function Layout({ children, currentPageName }) {
             </nav>
 
             {/* Main Content */}
-            <main className="pt-16">
+            <main className="pt-24">
                 {children}
             </main>
 
@@ -156,6 +158,7 @@ export default function Layout({ children, currentPageName }) {
                     </div>
                 </footer>
             )}
+            <Chatbot />
         </div>
     );
 }

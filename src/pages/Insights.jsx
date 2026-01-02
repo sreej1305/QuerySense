@@ -154,29 +154,33 @@ export default function Insights() {
                                 Workload Distribution
                             </CardTitle>
                         </CardHeader>
-                        <CardContent className="h-[300px]">
-                            <ResponsiveContainer width="100%" height="100%">
-                                <PieChart>
-                                    <Pie
-                                        data={pieData}
-                                        cx="50%"
-                                        cy="50%"
-                                        innerRadius={60}
-                                        outerRadius={80}
-                                        paddingAngle={5}
-                                        dataKey="value"
-                                    >
-                                        {pieData.map((entry, index) => (
-                                            <Cell key={`cell-${index}`} fill={entry.color} />
-                                        ))}
-                                    </Pie>
-                                    <Tooltip
-                                        contentStyle={{ backgroundColor: '#0f172a', border: '#1e293b' }}
-                                        itemStyle={{ color: '#fff' }}
-                                    />
-                                    <Legend />
-                                </PieChart>
-                            </ResponsiveContainer>
+                        <CardContent className="h-[300px] flex items-center justify-center">
+                            {pieData.length > 0 ? (
+                                <ResponsiveContainer width="100%" height="100%">
+                                    <PieChart>
+                                        <Pie
+                                            data={pieData}
+                                            cx="50%"
+                                            cy="50%"
+                                            innerRadius={60}
+                                            outerRadius={80}
+                                            paddingAngle={5}
+                                            dataKey="value"
+                                        >
+                                            {pieData.map((entry, index) => (
+                                                <Cell key={`cell-${index}`} fill={entry.color} />
+                                            ))}
+                                        </Pie>
+                                        <Tooltip
+                                            contentStyle={{ backgroundColor: '#0f172a', border: '#1e293b' }}
+                                            itemStyle={{ color: '#fff' }}
+                                        />
+                                        <Legend />
+                                    </PieChart>
+                                </ResponsiveContainer>
+                            ) : (
+                                <p className="text-slate-500">No data available</p>
+                            )}
                         </CardContent>
                     </Card>
 
@@ -188,18 +192,22 @@ export default function Insights() {
                                 Databases Used
                             </CardTitle>
                         </CardHeader>
-                        <CardContent className="h-[300px]">
-                            <ResponsiveContainer width="100%" height="100%">
-                                <BarChart data={dbData}>
-                                    <XAxis dataKey="name" stroke="#64748b" />
-                                    <YAxis stroke="#64748b" />
-                                    <Tooltip
-                                        contentStyle={{ backgroundColor: '#0f172a', border: '#1e293b' }}
-                                        itemStyle={{ color: '#fff' }}
-                                    />
-                                    <Bar dataKey="queries" fill="#8b5cf6" radius={[4, 4, 0, 0]} />
-                                </BarChart>
-                            </ResponsiveContainer>
+                        <CardContent className="h-[300px] flex items-center justify-center">
+                            {dbData.length > 0 ? (
+                                <ResponsiveContainer width="100%" height="100%">
+                                    <BarChart data={dbData}>
+                                        <XAxis dataKey="name" stroke="#64748b" />
+                                        <YAxis stroke="#64748b" />
+                                        <Tooltip
+                                            contentStyle={{ backgroundColor: '#0f172a', border: '#1e293b' }}
+                                            itemStyle={{ color: '#fff' }}
+                                        />
+                                        <Bar dataKey="queries" fill="#8b5cf6" radius={[4, 4, 0, 0]} />
+                                    </BarChart>
+                                </ResponsiveContainer>
+                            ) : (
+                                <p className="text-slate-500">No data available</p>
+                            )}
                         </CardContent>
                     </Card>
                 </div>
@@ -212,18 +220,22 @@ export default function Insights() {
                             Most Common Query Issues
                         </CardTitle>
                     </CardHeader>
-                    <CardContent className="h-[300px]">
-                        <ResponsiveContainer width="100%" height="100%">
-                            <BarChart data={issueData} layout="vertical">
-                                <XAxis type="number" stroke="#64748b" hide />
-                                <YAxis dataKey="name" type="category" stroke="#64748b" width={150} />
-                                <Tooltip
-                                    contentStyle={{ backgroundColor: '#0f172a', border: '#1e293b' }}
-                                    itemStyle={{ color: '#fff' }}
-                                />
-                                <Bar dataKey="count" fill="#f59e0b" radius={[0, 4, 4, 0]} />
-                            </BarChart>
-                        </ResponsiveContainer>
+                    <CardContent className="h-[300px] flex items-center justify-center">
+                        {issueData.length > 0 ? (
+                            <ResponsiveContainer width="100%" height="100%">
+                                <BarChart data={issueData} layout="vertical">
+                                    <XAxis type="number" stroke="#64748b" hide />
+                                    <YAxis dataKey="name" type="category" stroke="#64748b" width={150} />
+                                    <Tooltip
+                                        contentStyle={{ backgroundColor: '#0f172a', border: '#1e293b' }}
+                                        itemStyle={{ color: '#fff' }}
+                                    />
+                                    <Bar dataKey="count" fill="#f59e0b" radius={[0, 4, 4, 0]} />
+                                </BarChart>
+                            </ResponsiveContainer>
+                        ) : (
+                            <p className="text-slate-500">No issues detected yet</p>
+                        )}
                     </CardContent>
                 </Card>
             </div>

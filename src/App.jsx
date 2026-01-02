@@ -8,6 +8,7 @@ import History from './pages/History';
 import Insights from './pages/Insights';
 import Pricing from './pages/Pricing';
 import Payment from './pages/Payment';
+import Contact from './pages/Contact';
 import QueryDetail from './pages/QueryDetail';
 
 const queryClient = new QueryClient();
@@ -28,6 +29,7 @@ function App() {
           <Route path="/insights" element={<PageWrapper pageName="Insights"><Insights /></PageWrapper>} />
           <Route path="/pricing" element={<PageWrapper pageName="Pricing"><Pricing /></PageWrapper>} />
           <Route path="/payment" element={<PageWrapper pageName="Pricing"><Payment /></PageWrapper>} />
+          <Route path="/contact" element={<PageWrapper pageName="Contact"><Contact /></PageWrapper>} />
           <Route path="/querydetail" element={<PageWrapper pageName="Analyze"><QueryDetail /></PageWrapper>} />
         </Routes>
       </Router>
