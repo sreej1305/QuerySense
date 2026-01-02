@@ -20,7 +20,7 @@ function PageWrapper({ children, pageName }) {
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <Router>
+      <Router basename="/QuerySense">
         <Routes>
           <Route path="/" element={<PageWrapper pageName="Home"><Home /></PageWrapper>} />
           <Route path="/home" element={<PageWrapper pageName="Home"><Home /></PageWrapper>} />
