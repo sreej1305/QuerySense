@@ -103,50 +103,8 @@ Be thorough in analyzing:
 - N+1 query patterns`;
 
         const response = await base44.integrations.Core.InvokeLLM({
-            prompt: analysisPrompt,
-            response_json_schema: {
-                type: "object",
-                properties: {
-                    workload_category: { type: "string", enum: ["FAST", "MODERATE", "HEAVY"] },
-                    estimated_execution_time: { type: "string" },
-                    estimated_rows_scanned: { type: "number" },
-                    detected_issues: {
-                        type: "array",
-                        items: {
-                            type: "object",
-                            properties: {
-                                type: { type: "string" },
-                                description: { type: "string" },
-                                severity: { type: "string" }
-                            }
-                        }
-                    },
-                    optimization_suggestions: {
-                        type: "array",
-                        items: {
-                            type: "object",
-                            properties: {
-                                suggestion: { type: "string" },
-                                impact: { type: "string" },
-                                priority: { type: "string" }
-                            }
-                        }
-                    },
-                    index_suggestions: {
-                        type: "array",
-                        items: {
-                            type: "object",
-                            properties: {
-                                table: { type: "string" },
-                                columns: { type: "array", items: { type: "string" } },
-                                type: { type: "string" }
-                            }
-                        }
-                    },
-                    optimized_query: { type: "string" },
-                    explanation: { type: "string" }
-                }
-            }
+            query: query,
+            database_type: dbType
         });
 
         // Save to database
