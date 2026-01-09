@@ -59,13 +59,7 @@ WHERE o.created_at > '2024-01-01'`
         setResult(null);
         setStatus('Connecting to AI...');
 
-        // Emergency timeout: 30 seconds
-        const timeout = setTimeout(() => {
-            if (isAnalyzing) {
-                setIsAnalyzing(false);
-                setStatus('Service busy. Please try again.');
-            }
-        }, 30000);
+
 
         try {
             setStatus('Analyzing patterns...');
@@ -77,7 +71,7 @@ WHERE o.created_at > '2024-01-01'`
             setStatus('Finalizing results...');
             setResult(response);
             setIsAnalyzing(false);
-            clearTimeout(timeout);
+
 
             // Save to database in the background
             base44.entities.QueryAnalysis.create({
@@ -104,7 +98,7 @@ WHERE o.created_at > '2024-01-01'`
             console.error("Analysis failed:", error);
             setIsAnalyzing(false);
             setStatus('Analysis failed. Check your API key or connection.');
-            clearTimeout(timeout);
+
         }
     };
 

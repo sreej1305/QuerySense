@@ -14,6 +14,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
+import { chatWithKnowledgeBase } from '@/lib/analysisEngine';
 
 export default function Chatbot() {
     const [isOpen, setIsOpen] = useState(false);
@@ -47,28 +48,39 @@ export default function Chatbot() {
             timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
         };
 
-        setMessages(prev => [...prev, userMessage]);
+        const newMessages = [...messages, userMessage];
+        setMessages(newMessages);
         setInput('');
         setIsTyping(true);
 
-        // Simulate AI response
-        setTimeout(() => {
+        try {
+            // Use only the history for context, excluding the latest user message which sendChat handles (or manual history)
+            // Gemini SDK startChat history format: [{ role: 'user'|'model', parts: [{ text }] }]
+            // We pass the *previous* messages as history
+            const history = messages.map(m => ({
+                role: m.role === 'bot' ? 'model' : 'user',
+                content: m.content
+            }));
+
+            const responseText = await chatWithKnowledgeBase(history, input);
+
             const botResponse = {
                 role: 'bot',
-                content: getBotResponse(input),
+                content: responseText,
                 timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
             };
             setMessages(prev => [...prev, botResponse]);
+        } catch (error) {
+            console.error("Chat error:", error);
+            const errorResponse = {
+                role: 'bot',
+                content: "I'm having trouble connecting to my brain right now. Please check your API key.",
+                timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+            };
+            setMessages(prev => [...prev, errorResponse]);
+        } finally {
             setIsTyping(false);
-        }, 1500);
-    };
-
-    const getBotResponse = (query) => {
-        const q = query.toLowerCase();
-        if (q.includes('price') || q.includes('cost')) return "We have three plans: Basic (Free), Pro ($49/mo), and Enterprise. You can check the details on our Pricing page!";
-        if (q.includes('analyze') || q.includes('start')) return "To analyze a query, head over to the 'Analyze' section in the top menu. Just paste your SQL and select your database type!";
-        if (q.includes('help') || q.includes('optimize')) return "I can help you understand query bottlenecks, suggest indexes, and provide optimized SQL. What specific query are you working on?";
-        return "That's a great question! I'm specifically trained on SQL workload optimization. Feel free to ask about query performance, database scaling, or our platform features.";
+        }
     };
 
     return (
